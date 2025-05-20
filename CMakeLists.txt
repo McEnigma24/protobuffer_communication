@@ -7,15 +7,25 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+# PROTOBUFF #
+find_package(Protobuf REQUIRED)
+include_directories(${Protobuf_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+file(GLOB PROTO_FILES "${CMAKE_CURRENT_SOURCE_DIR}/_proto/*.proto")
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})
+
 set(LIBRARY_PATH_CORE ${CMAKE_CURRENT_SOURCE_DIR}/external/CORE_lib/build/)
 link_directories(${LIBRARY_PATH_CORE})
 
-include_directories(_inc external/CORE_lib/_inc)
+include_directories(_inc external/CORE_lib/_inc ${PROTO_HDRS} _proto)
 aux_source_directory(_src SOURCES)
 aux_source_directory(_src/base SOURCES)
+aux_source_directory(${PROTO_SRCS} SOURCES)
 
 aux_source_directory(_src TEST_SOURCES)
 aux_source_directory(_src/base TEST_SOURCES)
+aux_source_directory(${PROTO_SRCS} TEST_SOURCES)
 list(FILTER TEST_SOURCES EXCLUDE REGEX ".*main\\.cpp")
 aux_source_directory(_test TEST_SOURCES)
 
@@ -29,6 +39,7 @@ aux_source_directory(_test TEST_SOURCES)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wfatal-errors -Werror=uninitialized -Werror=init-self -Werror=reorder")    # for normal coding
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native -w")                                                         # for release
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lprotobuf")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
 
@@ -43,6 +54,7 @@ set(LINK_FLAGS "${LINK_FLAGS} -m64")
 
 set(ALL_LIBRARIES ${LIBRARY_PATH_CORE}/libCORE.a)
 # set(ALL_LIBRARIES ${ALL_LIBRARIES} ${LIBRARY_RANDOMS_LIB}/libRandoms.so)
+set(ALL_LIBRARIES ${ALL_LIBRARIES} ${Protobuf_LIBRARIES})
 
 
 set(CONST_TARGET_NAME "TEMPLATE")

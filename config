@@ -12,6 +12,9 @@ PACKAGES=(
     libstdc++-11-dev
     gcc-multilib
     g++-multilib
+    
+    protobuf-compiler
+    libprotobuf-dev
 )
 
 # Lista moich bibliotek #

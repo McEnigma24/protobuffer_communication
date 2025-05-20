@@ -117,6 +117,20 @@ function env_prep()
     # Usuń przetworzone opcje z listy argumentów #
     shift $((OPTIND -1))
     # echo "Pozostałe argumenty: $@"
+
+
+
+    # Protobuffer #
+
+    cd _proto
+    {
+        echo -ne "Protobuff generating..."
+
+        protoc --cpp_out=. *.proto
+
+        echo " DONE"
+    }
+    silent_come_back
 }
 function create_my_libraries()
 {
