@@ -116,7 +116,7 @@ function env_prep()
 
     # Usuń przetworzone opcje z listy argumentów #
     shift $((OPTIND -1))
-    echo "Pozostałe argumenty: $@"
+    # echo "Pozostałe argumenty: $@"
 }
 function create_my_libraries()
 {
