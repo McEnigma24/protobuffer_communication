@@ -1,28 +1,5 @@
-// #include "__preprocessor__.h"
+#include "__preprocessor__.h"
 #include "message.pb.h"
-
-// #ifdef BUILD_EXECUTABLE
-// int main(int argc, char* argv[])
-// {
-//     srand(time(NULL));
-//     // CORE::clear_terminal(); // tests will NOT be VISIBLE with this line
-//     time_stamp("It just works");
-
-//     CORE::str::split_string("Hello World!", ' ');
-//     var(CORE::str::to_lower_case("Hello, World!"));
-
-//     show_sizeof(test);
-//     show_sizeof_many(test, 100);
-
-//     int num = 123456789;
-//     double num2 = 1234567.89123;
-
-//     cout << CORE::format_number(num) << endl;
-//     cout << CORE::format_number(num2) << endl;
-
-//     return 0;
-// }
-// #endif
 
 #ifdef BUILD_EXECUTABLE
 int main()
@@ -36,24 +13,48 @@ int main()
     person.set_id(123);
     person.set_email("jan.kowalski@example.com");
 
-    // Serializacja do pliku
-    std::ofstream output("person.bin", std::ios::binary);
-    if (!person.SerializeToOstream(&output))
-    {
-        std::cerr << "Błąd podczas zapisu danych." << std::endl;
-        return -1;
-    }
-    output.close();
-
-    // Deserializacja z pliku
     tutorial::Person person_read;
-    std::ifstream input("person.bin", std::ios::binary);
-    if (!person_read.ParseFromIstream(&input))
+
+    if (1)
     {
-        std::cerr << "Błąd podczas odczytu danych." << std::endl;
-        return -1;
+        // Obliczanie rozmiaru wiadomości
+        int size = person.ByteSizeLong();
+        vector<u8> buffer;
+        buffer.resize(size);
+
+        // Serializacja do bufora
+        if (!person.SerializeToArray(buffer.data(), size))
+        {
+            std::cerr << "Błąd podczas serializacji wiadomości." << std::endl;
+            return -1;
+        }
+
+        if (!person_read.ParseFromArray(buffer.data(), size))
+        {
+            std::cerr << "Błąd podczas deserializacji wiadomości." << std::endl;
+            return -1;
+        }
     }
-    input.close();
+    else
+    {
+        // Serializacja do pliku
+        std::ofstream output("person.bin", std::ios::binary);
+        if (!person.SerializeToOstream(&output))
+        {
+            std::cerr << "Błąd podczas zapisu danych." << std::endl;
+            return -1;
+        }
+        output.close();
+
+        // Deserializacja z pliku
+        std::ifstream input("person.bin", std::ios::binary);
+        if (!person_read.ParseFromIstream(&input))
+        {
+            std::cerr << "Błąd podczas odczytu danych." << std::endl;
+            return -1;
+        }
+        input.close();
+    }
 
     // Wyświetlenie odczytanych danych
     std::cout << "Imię: " << person_read.name() << std::endl;
